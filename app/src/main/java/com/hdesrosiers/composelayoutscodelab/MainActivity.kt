@@ -2,6 +2,7 @@ package com.hdesrosiers.composelayoutscodelab
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.ScrollableRow
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -35,7 +36,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             ComposeLayoutsCodelabTheme {
-                PhotographCard()
+                LayoutsCodelab()
             }
         }
     }
@@ -112,12 +113,12 @@ fun LayoutsCodelab() {
                 }
             )
         }
-    ) {
-        innerPadding ->
+    ) { innerPadding ->
         BodyContent(
             Modifier
                 .padding(innerPadding)
-                .padding(8.dp))
+                .padding(8.dp)
+        )
     }
 }
 
@@ -130,6 +131,13 @@ fun BodyContent(modifier: Modifier = Modifier) {
             Text("vertically.")
             Text("We've done it by hand!")
             PhotographCard()
+            ScrollableRow(modifier = modifier) {
+                StaggeredGrid(modifier = modifier, rows = 5) {
+                    for (topic in topics) {
+                        Chip(modifier = Modifier.padding(8.dp), text = topic)
+                    }
+                }
+            }
         }
     }
 }
@@ -145,10 +153,10 @@ fun PhotographCard(modifier: Modifier = Modifier) {
             .padding(16.dp)
     ) {
         Surface(
-                modifier = Modifier
-                    .preferredSize(50.dp),
-                shape = CircleShape,
-                color = MaterialTheme.colors.onSurface.copy(alpha = 0.2f)
+            modifier = Modifier
+                .preferredSize(50.dp),
+            shape = CircleShape,
+            color = MaterialTheme.colors.onSurface.copy(alpha = 0.2f)
         ) {
 
         }
@@ -158,26 +166,26 @@ fun PhotographCard(modifier: Modifier = Modifier) {
                 .align(Alignment.CenterVertically)
         ) {
             Text(
-                    text = "Alfred Sisley",
-                    fontWeight = FontWeight.Bold
+                text = "Alfred Sisley",
+                fontWeight = FontWeight.Bold
             )
             Providers(AmbientContentAlpha provides ContentAlpha.medium) {
                 Text(
-                        text = "3 minutes ago",
-                        style = MaterialTheme.typography.body2
+                    text = "3 minutes ago",
+                    style = MaterialTheme.typography.body2
                 )
             }
         }
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun PhotographerCardPreview() {
-    ComposeLayoutsCodelabTheme {
-        PhotographCard()
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun PhotographerCardPreview() {
+//    ComposeLayoutsCodelabTheme {
+//        PhotographCard()
+//    }
+//}
 
 
 @Preview(showBackground = true)
@@ -188,18 +196,18 @@ fun LayoutsCodelabPreview() {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun TextWithPaddingToBaselinePreview() {
-    ComposeLayoutsCodelabTheme {
-        Text("Hi there!", Modifier.firstBaselineToTop(32.dp))
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun TextWithNormalPaddingPreview() {
-    ComposeLayoutsCodelabTheme {
-        Text("Hi there!", Modifier.padding(top = 32.dp))
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun TextWithPaddingToBaselinePreview() {
+//    ComposeLayoutsCodelabTheme {
+//        Text("Hi there!", Modifier.firstBaselineToTop(32.dp))
+//    }
+//}
+//
+//@Preview(showBackground = true)
+//@Composable
+//fun TextWithNormalPaddingPreview() {
+//    ComposeLayoutsCodelabTheme {
+//        Text("Hi there!", Modifier.padding(top = 32.dp))
+//    }
+//}
