@@ -19,9 +19,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.AlignmentLine
+import androidx.compose.ui.layout.FirstBaseline
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.hdesrosiers.composelayoutscodelab.ui.theme.ComposeLayoutsCodelabTheme
 
@@ -31,6 +36,60 @@ class MainActivity : AppCompatActivity() {
         setContent {
             ComposeLayoutsCodelabTheme {
                 PhotographCard()
+            }
+        }
+    }
+}
+
+
+// Custom layout modifier
+fun Modifier.firstBaselineToTop(
+    firstBaselineToTop: Dp
+) = Modifier.layout { measurable, constraints ->
+    val placeable = measurable.measure(constraints)
+
+    // Check the composable has a first baseline
+    check(placeable[FirstBaseline] != AlignmentLine.Unspecified)
+    val firstBaseline = placeable[FirstBaseline]
+
+    // Height of the composable with padding - first baseline
+    val placeableY = firstBaselineToTop.toIntPx() - firstBaseline
+    val height = placeable.height + placeableY
+    layout(placeable.width, height) {
+        placeable.placeRelative(0, placeableY)
+    }
+}
+
+// Custom column composable
+@Composable
+fun MyOwnColumn(
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
+) {
+    Layout(
+        modifier = modifier,
+        content = content
+    ) { measurables, constraints ->
+
+        // Don't constrain child views further, measure them with given constraints
+        // List of measured children
+        val placeables = measurables.map { measurable ->
+            // Measure each child
+            measurable.measure(constraints)
+        }
+
+        // Track the y co-ord we have placed children up to
+        var yPosition = 0
+
+        // Set the size of the layout as big as it can
+        layout(constraints.maxWidth, constraints.maxHeight) {
+            // Place children in the parent layout
+            placeables.forEach { placeable ->
+                // Position item on the screen
+                placeable.placeRelative(x = 0, y = yPosition)
+
+                // Record the y co-ord placed up to
+                yPosition += placeable.height
             }
         }
     }
@@ -64,15 +123,14 @@ fun LayoutsCodelab() {
 
 @Composable
 fun BodyContent(modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier
-    ) {
-        Text(
-            text = "Hi there!",
-        )
-        Text(
-            text = "Thanks for going through the Layouts codelab",
-        )
+    Surface(Modifier.padding(8.dp)) {
+        MyOwnColumn {
+            Text("MyOwnColumn")
+            Text("places items")
+            Text("vertically.")
+            Text("We've done it by hand!")
+            PhotographCard()
+        }
     }
 }
 
@@ -127,5 +185,21 @@ fun PhotographerCardPreview() {
 fun LayoutsCodelabPreview() {
     ComposeLayoutsCodelabTheme {
         LayoutsCodelab()
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun TextWithPaddingToBaselinePreview() {
+    ComposeLayoutsCodelabTheme {
+        Text("Hi there!", Modifier.firstBaselineToTop(32.dp))
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun TextWithNormalPaddingPreview() {
+    ComposeLayoutsCodelabTheme {
+        Text("Hi there!", Modifier.padding(top = 32.dp))
     }
 }
